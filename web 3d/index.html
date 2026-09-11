@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GÜINAO LABS | SYS.UI.V1</title>
+    <style>
+        /* Variables de color estilo JARVIS */
+        :root {
+            --bg-color: #050a0f;
+            --glass-bg: rgba(0, 20, 30, 0.4);
+            --glass-border: rgba(0, 243, 255, 0.2);
+            --neon-cyan: #00f3ff;
+            --neon-blue: #0088ff;
+            --text-main: #e0fbfc;
+            --text-muted: #83a0a6;
+            --tech-font: 'Consolas', 'Courier New', monospace;
+        }
+
+        /* Reseteo */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        /* Fondo HUD (Cuadrícula y Luces) */
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(0, 243, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 30%, rgba(0, 136, 255, 0.08) 0%, transparent 40%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Cuadrícula holográfica de fondo */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-image: 
+                linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px), 
+                linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Barra Superior / Logo */
+        nav {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 15px 5%;
+            background: linear-gradient(90deg, rgba(0,20,30,0.9) 0%, transparent 100%);
+            border-bottom: 1px solid rgba(0, 243, 255, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .logo {
+            font-size: 26px;
+            font-weight: 900;
+            letter-spacing: 4px;
+            color: var(--text-main);
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+            text-decoration: none;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .logo span { color: var(--neon-cyan); }
+        .logo::after {
+            content: " // SYS.ONLINE";
+            font-family: var(--tech-font);
+            font-size: 0.7rem;
+            color: var(--neon-cyan);
+            opacity: 0.6;
+            letter-spacing: 1px;
+            vertical-align: super;
+        }
+
+        /* Lógica de Secciones */
+        .page-section {
+            display: none;
+            animation: bootUp 0.5s ease-out forwards;
+            flex-grow: 1;
+        }
+
+        .active-section { display: block; }
+
+        @keyframes bootUp {
+            0% { opacity: 0; transform: scale(0.98) translateY(20px); filter: blur(5px); }
+            50% { filter: blur(2px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+        }
+
+        .content-wrapper {
+            padding: 40px 5% 100px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* BOTÓN REGRESAR / HUD VOLVER */
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 40px;
+            padding: 8px 15px;
+            font-family: var(--tech-font);
+            font-size: 0.85rem;
+            color: var(--neon-cyan);
+            background: rgba(0, 243, 255, 0.05);
+            border: 1px solid var(--neon-cyan);
+            border-left: 4px solid var(--neon-cyan);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.1);
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+        }
+
+        .btn-back:hover {
+            background: rgba(0, 243, 255, 0.2);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.4);
+            transform: translateX(-5px);
+        }
+
+        /* Hero Section (Inicio) */
+        .hero {
+            text-align: center;
+            padding: 60px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            margin-bottom: 20px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #fff;
+            text-shadow: 0 0 15px var(--neon-cyan), 0 0 30px var(--neon-blue);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto 40px auto;
+            line-height: 1.6;
+        }
+
+        /* BOTONES DEL MENÚ PRINCIPAL TIPO IRON MAN */
+        .hero-buttons {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+            width: 100%;
+            position: relative;
+        }
+
+        .btn-hero {
+            position: relative;
+            padding: 20px 50px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--neon-cyan);
+            background: rgba(0, 20, 30, 0.6);
+            border: 1px solid var(--glass-border);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            /* Esquinas recortadas (Sci-Fi look) */
+            clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
+        }
+
+        /* Efecto targeting crosshair al pasar el mouse */
+        .btn-hero::before, .btn-hero::after {
+            content: '';
+            position: absolute;
+            width: 15px; height: 15px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        .btn-hero::before { top: 5px; left: 5px; border-top-color: var(--neon-cyan); border-left-color: var(--neon-cyan); }
+        .btn-hero::after { bottom: 5px; right: 5px; border-bottom-color: var(--neon-cyan); border-right-color: var(--neon-cyan); }
+
+        .btn-hero:hover {
+            background: rgba(0, 243, 255, 0.15);
+            color: #fff;
+            box-shadow: inset 0 0 20px rgba(0, 243, 255, 0.4), 0 0 30px rgba(0, 243, 255, 0.4);
+            border-color: var(--neon-cyan);
+        }
+        
+        .btn-hero:hover::before { top: -2px; left: -2px; }
+        .btn-hero:hover::after { bottom: -2px; right: -2px; }
+
+        /* Títulos de sección interna */
+        .section-title {
+            text-align: center;
+            font-size: 2.2rem;
+            margin-bottom: 50px;
+            color: var(--text-main);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+        }
+        
+        /* Línea escáner debajo de títulos */
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 100px;
+            height: 2px;
+            background: var(--neon-cyan);
+            margin: 15px auto 0;
+            box-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan);
+        }
+
+        /* Grilla de Catálogo (2 y 2) */
+        .catalog {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+        }
+
+        /* TARJETAS ESTILO HUD */
+        .card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-top: 3px solid var(--neon-cyan);
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Texto de datos falso en las tarjetas */
+        .card::before {
+            content: 'DATA.STRM // ACTIVE';
+            position: absolute;
+            top: -20px; left: 10px;
+            font-family: var(--tech-font);
+            font-size: 0.65rem;
+            color: var(--neon-cyan);
+            opacity: 0.7;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(0, 243, 255, 0.15);
+            border-color: rgba(0, 243, 255, 0.4);
+        }
+
+        .card-img {
+            width: 100%;
+            height: 350px;
+            object-fit: contain;
+            border-bottom: 1px solid rgba(0,243,255,0.3);
+            margin-bottom: 20px;
+            background: rgba(0,0,0,0.6);
+            /* Pequeño escaneo sobre la imagen al pasar el mouse */
+            transition: filter 0.3s;
+        }
+
+        .card:hover .card-img {
+            filter: contrast(1.1) brightness(1.2);
+        }
+
+        .card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: var(--text-main);
+            text-transform: uppercase;
+        }
+
+        .card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+
+        /* Botón de acción pequeño */
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: transparent;
+            color: var(--neon-cyan);
+            border: 1px solid var(--neon-cyan);
+            font-family: var(--tech-font);
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .btn:hover {
+            background: var(--neon-cyan);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-cyan);
+        }
+
+        /* Tarjeta de Info (HUD Data block) */
+        .info-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--neon-cyan);
+            padding: 40px;
+            text-align: left;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.8;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            position: relative;
+            box-shadow: inset 0 0 30px rgba(0, 243, 255, 0.05);
+        }
+        
+        /* Decoraciones de esquina en Info */
+        .info-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0; right: 0;
+            width: 30px; height: 30px;
+            border-bottom: 3px solid var(--neon-cyan);
+            border-right: 3px solid var(--neon-cyan);
+        }
+
+        .info-card strong { color: var(--neon-cyan); }
+
+        /* Redes Sociales y Contacto */
+        .social-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        .btn-social {
+            padding: 15px 40px;
+            font-family: var(--tech-font);
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-decoration: none;
+            color: white;
+            transition: all 0.2s;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+        }
+
+        .btn-social:hover { transform: scale(1.05); filter: brightness(1.2); }
+        .btn-wsp { background: #1b8a42; border-left: 2px solid #25D366; }
+        .btn-ig { background: #961655; border-left: 2px solid #e6683c; }
+        .btn-fb { background: #0c4d9e; border-left: 2px solid #1877F2; }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-muted);
+            font-family: var(--tech-font);
+            font-size: 0.75rem;
+            background: rgba(0,0,0,0.8);
+            border-top: 1px solid var(--glass-border);
+            margin-top: auto;
+            letter-spacing: 1px;
+        }
+
+        /* Responsive para celulares */
+        @media (max-width: 768px) {
+            nav { justify-content: center; }
+            .hero-buttons { flex-direction: column; gap: 15px; padding: 0 20px; }
+            .btn-hero { width: 100%; }
+            .catalog { grid-template-columns: 1fr; }
+            h1 { font-size: 2.2rem; }
+            .card-img { height: 250px; }
+            .info-card { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Menú Superior (Logo Centralizado de Sistema) -->
+    <nav>
+        <a onclick="cambiarSeccion('inicio')" class="logo" title="Reiniciar Sistema">GÜINAO<span>LABS</span></a>
+    </nav>
+
+    <!-- 1. SECCIÓN INICIO -->
+    <section id="inicio" class="page-section active-section content-wrapper">
+        <div class="hero">
+            <h1>Fabricación Digital Avanzada</h1>
+            <p class="subtitle" style="font-family: var(--tech-font);">[ Inicializando protocolos de diseño e impresión 3D de alta precisión ]</p>
+            
+            <div class="hero-buttons">
+                <a onclick="cambiarSeccion('modelos')" class="btn-hero">Base de Datos 3D</a>
+                <a onclick="cambiarSeccion('info')" class="btn-hero">Info del Sistema</a>
+                <a onclick="cambiarSeccion('contacto')" class="btn-hero">Enlace de Contacto</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. SECCIÓN MODELOS -->
+    <section id="modelos" class="page-section content-wrapper">
+        <!-- BOTÓN REGRESAR -->
+        <a onclick="cambiarSeccion('inicio')" class="btn-back">◄ Abortar / Menú Principal</a>
+        
+        <h2 class="section-title">Registro de Piezas</h2>
+        <div class="catalog">
+            
+            <div class="card">
+                <img src="celular.jpeg" alt="Soporte para celular" class="card-img">
+                <h3>Soporte para celular sencillo. AR$ 4.723.</h3>
+                <p>Módulo de anclaje para celulares. Práctico, resistente y con diseño sencillo para cualquier ocasión</p>
+                <a onclick="cambiarSeccion('contacto')" class="btn">Solicitar Unidad</a>
+            </div>
+
+            <div class="card">
+                <img src="engranaje.jpg" alt="Soporte regulable para celular" class="card-img">
+                <h3>Soporte con mecanismo de engranajes. AR$ 8.000.</h3>
+                <p>Podés inclinar la posición del celular a gusto con el mecanismo de engranajes.</p>
+                <a onclick="cambiarSeccion('contacto')" class="btn">Solicitar Unidad</a>
+            </div>
+
+            <div class="card">
+                <img src="pokebola3.jpeg" alt="POKEBOLA maceta" class="card-img">
+                <h3>Maceta con forma de Pokebola. AR$ 13.000</h3>
+                <p>Sirve para colocar plantas con un hueco en el fondo para el drenaje, también sirve para guardar cosas dentro o simplemente como adorno.</p>
+                <a onclick="cambiarSeccion('contacto')" class="btn">Solicitar Unidad</a>
+            </div>
+            
+            <div class="card">
+                <img src="vaso.jpeg" alt="Jarra de la Selección Argentina" class="card-img">
+                <h3>Jarra con tematica Argentina. AR$ 24.717</h3>
+                <p>Incluira un vaso apto para bebidas en su interior, aunque tambien sirve como adorno.</p>
+                <a onclick="cambiarSeccion('contacto')" class="btn">Solicitar Unidad</a>
+            </div>
+
+            <div class="card">
+                <img src="tarjeta.jpg" alt="Tarjeta para emprendimientos" class="card-img">
+                <h3>Tarjeta para emprendedores con QR funcional. AR$ 2500.</h3>
+                <p>Puedo incluir el QR que vaya a tu sitio web o red social, ademas de incluir los datos que gustes para mostrar o entregar</p>
+                <a onclick="cambiarSeccion('contacto')" class="btn">Solicitar Unidad</a>
+            </div>
+
+            <div class="card">
+                <img src="titulo.jpg" alt="Letrero profesional" class="card-img">
+                <h3>Letrero para adornar tu escritorio con tu nombre y tu profesión (o lo que gustes) AR$ 15.000</h3>
+                <p>Puedo incluir el QR que vaya a tu sitio web o red social, ademas de incluir los datos que gustes para mostrar o entregar</p>
+                <a onclick="cambiarSeccion('contacto')" class="btn">Solicitar Unidad</a>
+            </div>
+
+             <div class="card">
+                <img src="controless.jpg" alt="Soporte para controles" class="card-img">
+                <h3>Entran 3 controles pequeños estilo FireTV o similares. AR$ 9.039.</h3>
+                <p>Puedo incluir el QR que vaya a tu sitio web o red social, ademas de incluir los datos que gustes para mostrar o entregar</p>
+                <a onclick="cambiarSeccion('contacto')" class="btn">Solicitar Unidad</a>
+            </div>
+
+            <div class="card">
+                <img src="orga.jpg" alt="Organizador de escritorio" class="card-img">
+                <h3>Cuenta con soporte para celular y varios espacios para guardar diferentes cosas AR$ 18.623.</h3>
+                <p>Se puede hacer de mas de un color aunque varia su precio.</p>
+                <a onclick="cambiarSeccion('contacto')" class="btn">Solicitar Unidad</a>
+            </div>
+
+             <div class="card">
+                <img src="joystick.jpg" alt="Soporte para Joystick" class="card-img">
+                <h3>Soporte para Joystick, en este caso de Xbox Series pero se pueden hacer para cualquiera. AR$ 5.000.</h3>
+                <p>Se puede hacer de mas de un color aunque varia su precio.</p>
+                <a onclick="cambiarSeccion('contacto')" class="btn">Solicitar Unidad</a>
+            </div>
+
+              <div class="card">
+                <img src="llave.jpg" alt="Llaveros de lo que gustes" class="card-img">
+                <h3>Llaveros de lo que desees, marcas de autos, equipos de futbol, anime, videojuegos, nombres, etc. AR$ 3.000. c/u</h3>
+                <p>Se puede hacer de mas de un color aunque varia su precio.</p>
+                <a onclick="cambiarSeccion('contacto')" class="btn">Solicitar Unidad</a>
+            </div>
+
+
+
+
+        </div>
+    </section>
+
+    <!-- 3. SECCIÓN INFO -->
+    <section id="info" class="page-section content-wrapper">
+        <!-- BOTÓN REGRESAR -->
+        <a onclick="cambiarSeccion('inicio')" class="btn-back">◄ Abortar / Menú Principal</a>
+
+        <h2 class="section-title">Info sobre nosotros</h2>
+        <div class="info-card">
+            <p style="font-family: var(--tech-font); color: var(--neon-cyan); margin-bottom: 20px;">>EJECUTANDO RUTINA DE PRESENTACIÓN... </p>
+            <p>En <strong>Güinao Labs</strong> Podemos imprimir lo que desees, ya sea nuestros ejemplos o los que gustes, podes enviarnos el arhivo stl, link o describirnos la idea y nosotros nos encargamos.
+                Usamos material PLA, por lo que lo que no pueden ser objetos que tengan contacto con comidas ni bebidas a excepción de nuestros vasos y jarras que incluiran un vaso apto para bebidas dentro.<strong></strong>.</p>
+            <br>
+            <p>Ya sea que busques actualizar tu setup gaming, queres hacer un regalo, adronar tu casa, o algun llavero que publicite tu negocio, lo que sea... habla con nosotros.</p>
+            
+        </div>
+    </section>
+
+    <!-- 4. SECCIÓN CONTACTO -->
+    <section id="contacto" class="page-section content-wrapper" style="text-align: center;">
+        <!-- BOTÓN REGRESAR -->
+        <div style="text-align: left;">
+            <a onclick="cambiarSeccion('inicio')" class="btn-back">◄ Abortar / Menú Principal</a>
+        </div>
+
+        <h2 class="section-title">Establecer Conexión</h2>
+        <p style="color: var(--text-muted); font-size: 1.2rem; margin-bottom: 20px; font-family: var(--tech-font);">
+            [ UBICACIÓN BASE: Comodoro Rivadavia, Chubut ]
+        </p>
+        
+        <div class="social-container">
+            <a href="https://instagram.com/guinaolabs3d/" target="_blank" class="btn-social btn-ig">Red Instagram</a>
+            <a href="https://facebook.com/profile.php?id=61593984365440" target="_blank" class="btn-social btn-fb">Red Facebook</a>
+        </div>
+    </section>
+
+    <!-- Pie de página -->
+    <footer>
+        &copy; 2026 GÜINAO LABS. TERMINAL: COMODORO RIVADAVIA.
+    </footer>
+
+    <!-- Scripts de interactividad -->
+    <script>
+        function cambiarSeccion(idSeccion) {
+            document.querySelectorAll('.page-section').forEach(seccion => {
+                seccion.classList.remove('active-section');
+            });
+            document.getElementById(idSeccion).classList.add('active-section');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
